@@ -64,6 +64,12 @@ test('getCommentary keeps notes in range and the chapter introduction; undefined
     notes: [{ chapter: 3, verse: 16, text: 'On v16\nmore' }],
   });
   assert.equal(await getCommentary(client, 'keil-delitzsch', parseReference('Jn 3:16')), undefined);
+
+  // Section-based commentaries: the note that starts before the passage covers its first verse.
+  const covering = await getCommentary(client, 'matthew-henry', parseReference('Jn 3:17-18'));
+  assert.deepEqual(covering?.notes, [{ chapter: 3, verse: 16, text: 'On v16\nmore' }]);
+  const exact = await getCommentary(client, 'matthew-henry', parseReference('Jn 3:16'));
+  assert.deepEqual(exact?.notes.map((n) => n.verse), [16]);
 });
 
 test('getCrossReferences flattens, filters by score, sorts and limits per verse', async () => {

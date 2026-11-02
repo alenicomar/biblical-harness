@@ -48,7 +48,10 @@ export interface CommentaryExcerpt {
 
 /**
  * Notes of one commentary for a passage, plus the introduction of each chapter
- * spanned. `undefined` when the commentary covers none of those chapters.
+ * spanned. Commentaries that annotate by section key a note to its first verse,
+ * so when no note starts on the passage's first verse, the closest earlier note
+ * in that chapter (the section covering it) is included first. `undefined` when
+ * the commentary covers none of those chapters.
  */
 export async function getCommentary(
   client: BibleApiClient,
@@ -64,8 +67,14 @@ export async function getCommentary(
     found = true;
     if (data.commentary) result.commentary = { id: data.commentary.id, name: data.commentary.name };
     if (data.chapter.introduction) result.introductions.push({ chapter, text: data.chapter.introduction });
-    for (const entry of data.chapter.content) {
-      if (entry.type === 'verse' && containsVerse(ref, chapter, entry.number)) {
+    const entries = data.chapter.content.filter((entry) => entry.type === 'verse');
+    const firstVerse = chapter === ref.startChapter ? ref.startVerse : undefined;
+    if (firstVerse !== undefined && !entries.some((entry) => entry.number === firstVerse)) {
+      const covering = entries.filter((entry) => entry.number < firstVerse).at(-1);
+      if (covering) result.notes.push({ chapter, verse: covering.number, text: covering.content.join('\n') });
+    }
+    for (const entry of entries) {
+      if (containsVerse(ref, chapter, entry.number)) {
         result.notes.push({ chapter, verse: entry.number, text: entry.content.join('\n') });
       }
     }
