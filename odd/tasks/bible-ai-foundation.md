@@ -19,7 +19,7 @@ Foundation of a Protestant/Evangelical Bible-study ecosystem for AI: a typed cor
 - [x] **T3** — S4, S7 — inline — Harness contract, shared guardrails, doctrinal profiles (plural default), prompt builder, skill renderer, LLM provider interface + Anthropic adapter (`src/harness/*`). Commit: ed63d6d
 - [x] **T4** — S6 — inline — `passage-exegesis` harness (`src/harnesses/passage-exegesis.ts`). Commit: 936c23a
 - [x] **T5** — S6 — inline — `thematic-study` harness over open-cross-ref (`src/harnesses/thematic-study.ts`). Commit: 5fde748
-- [x] **T6** — S3, S4 — inline — CLI (`bible-ai`), generated `skills/*/SKILL.md`, README with architecture and MCP roadmap. Commit: PENDING
+- [x] **T6** — S3, S4 — inline — CLI (`bible-ai`), generated `skills/*/SKILL.md`, README with architecture and MCP roadmap. Commit: f69ccf5
 
 ## Log
 
