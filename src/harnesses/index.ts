@@ -1,8 +1,9 @@
 import type { AnyHarness } from '../harness/contract.ts';
 import { passageExegesis } from './passage-exegesis.ts';
+import { thematicStudy } from './thematic-study.ts';
 
 /** Every harness the CLI, the skill generator and (later) the MCP server expose. */
-export const HARNESSES: readonly AnyHarness[] = [passageExegesis as AnyHarness];
+export const HARNESSES: readonly AnyHarness[] = [passageExegesis as AnyHarness, thematicStudy as AnyHarness];
 
 export function getHarness(id: string): AnyHarness {
   const harness = HARNESSES.find((h) => h.id === id);
