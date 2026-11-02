@@ -18,8 +18,8 @@ Foundation of a Protestant/Evangelical Bible-study ecosystem for AI: a typed cor
 - [x] **T2** — S2, S3 — inline — API client with injectable fetch and permanent cache, API types, chapter flattening, passage extraction, cross-references (`src/core/*`). Commit: 837bbb1
 - [x] **T3** — S4, S7 — inline — Harness contract, shared guardrails, doctrinal profiles (plural default), prompt builder, skill renderer, LLM provider interface + Anthropic adapter (`src/harness/*`). Commit: ed63d6d
 - [x] **T4** — S6 — inline — `passage-exegesis` harness (`src/harnesses/passage-exegesis.ts`). Commit: 936c23a
-- [x] **T5** — S6 — inline — `thematic-study` harness over open-cross-ref (`src/harnesses/thematic-study.ts`). Commit: PENDING
-- [ ] **T6** — S3, S4 — inline — CLI (`bible-ai`), generated `skills/*/SKILL.md`, README with architecture and MCP roadmap. Commit: —
+- [x] **T5** — S6 — inline — `thematic-study` harness over open-cross-ref (`src/harnesses/thematic-study.ts`). Commit: 5fde748
+- [x] **T6** — S3, S4 — inline — CLI (`bible-ai`), generated `skills/*/SKILL.md`, README with architecture and MCP roadmap. Commit: PENDING
 
 ## Log
 
@@ -29,3 +29,4 @@ Foundation of a Protestant/Evangelical Bible-study ecosystem for AI: a typed cor
 - **L4** — Decisions: single package with module boundaries (`core`, `harness`, `harnesses`, `cli`; `mcp` later). Code, prompts and docs in English; analysis output language is an input defaulting to Spanish (`es`). Default translation `spa_r09`. Runtime dep: `zod` only (schemas reusable by the future MCP SDK). Pipeline LLM provider behind an interface; Anthropic adapter via fetch; `prompt`/dry-run works without any key.
 - **L5** — Evidence (T4 live smoke): section-based commentaries (Matthew Henry, Tyndale "3:16-21") key a note to the section's first verse, so Jn 3:16-17 returned 0 Henry notes. Fix: `getCommentary` includes the closest earlier note covering the passage's first verse (pinned in `test/core/passage.test.ts`).
 - **L6** — Evidence (T5, delegated to gentle-ai-worker; parent re-ran `npm run check`: 40/40, plus live smoke for "justificación por la fe" from Ro 3:21-26 + Gá 2:16). Known follow-up: overlapping targets are not merged ("1 Pedro 1:18-19" and "1 Pedro 1:18-20" both kept); depth-2 re-hits add score to depth-1 targets.
+- **L7** — Evidence (T6, delegated to gentle-ai-worker; parent re-ran `npm run check`: 72/72, plus live CLI: `passage "Jn 3:16-17"` exit 0, `xref "Sal 23:1"`, unknown harness exit 2, `passage "Juan 22:1"` exit 1, `prompt thematic-study --profile pentecostal`). Untested: default on-disk `FileCache` path through the CLI.

@@ -7,9 +7,13 @@
   "engines": {
     "node": ">=24"
   },
+  "bin": {
+    "bible-ai": "src/cli/main.ts"
+  },
   "scripts": {
     "test": "node --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
+    "skills": "node src/cli/main.ts skills build",
     "check": "npm run typecheck && npm test"
   },
   "dependencies": {
