@@ -32,14 +32,40 @@ export class AnthropicProvider implements LlmProvider {
   constructor(options: AnthropicProviderOptions = {}) {
     const apiKey = options.apiKey ?? process.env.ANTHROPIC_API_KEY;
     if (!apiKey) throw new Error('AnthropicProvider needs an API key: pass apiKey or set ANTHROPIC_API_KEY.');
-    this.#apiKey = apiKey;
+    // Header values must be printable ASCII; reject without echoing the key.
+    if (!/^[\x21-\x7E]+$/.test(apiKey.trim())) throw new Error('ANTHROPIC_API_KEY contains invalid characters.');
+    this.#apiKey = apiKey.trim();
     this.model = options.model ?? process.env.BIBLE_AI_MODEL ?? DEFAULT_ANTHROPIC_MODEL;
     this.#baseUrl = (options.baseUrl ?? 'https://api.anthropic.com').replace(/\/+$/, '');
     this.#fetch = options.fetch ?? globalThis.fetch;
   }
 
   async complete(request: LlmRequest): Promise<string> {
-    const response = await this.#fetch(`${this.#baseUrl}/v1/messages`, {
+    let response: Response;
+    try {
+      response = await this.#send(request);
+    } catch (error) {
+      throw new Error(`Anthropic API request failed: ${this.#redact((error as Error).message)}`);
+    }
+    const body = (await response.json().catch(() => ({}))) as {
+      content?: Array<{ type: string; text?: string }>;
+      error?: { message?: string };
+    };
+    if (!response.ok) {
+      throw new Error(`Anthropic API responded ${response.status}: ${this.#redact(body.error?.message ?? 'no details')}`);
+    }
+    return (body.content ?? [])
+      .filter((block) => block.type === 'text')
+      .map((block) => block.text ?? '')
+      .join('');
+  }
+
+  #redact(text: string): string {
+    return text.replaceAll(this.#apiKey, '[redacted]');
+  }
+
+  #send(request: LlmRequest): Promise<Response> {
+    return this.#fetch(`${this.#baseUrl}/v1/messages`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -53,17 +79,5 @@ export class AnthropicProvider implements LlmProvider {
         messages: [{ role: 'user', content: request.user }],
       }),
     });
-    const body = (await response.json().catch(() => ({}))) as {
-      content?: Array<{ type: string; text?: string }>;
-      error?: { message?: string };
-    };
-    if (!response.ok) {
-      const detail = body.error?.message?.replaceAll(this.#apiKey, '[redacted]') ?? 'no details';
-      throw new Error(`Anthropic API responded ${response.status}: ${detail}`);
-    }
-    return (body.content ?? [])
-      .filter((block) => block.type === 'text')
-      .map((block) => block.text ?? '')
-      .join('');
   }
 }

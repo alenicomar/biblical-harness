@@ -29,6 +29,19 @@ export class BibleApiError extends Error {
   }
 }
 
+const SAFE_ID = /^[A-Za-z0-9_-]+$/;
+
+/** Ids become URL and cache path segments, so only plain identifiers are accepted. */
+function safeId(value: string, kind: string): string {
+  if (!SAFE_ID.test(value)) throw new Error(`Invalid ${kind} id "${value}": use letters, digits, "_" or "-".`);
+  return value;
+}
+
+function safeChapter(value: number): number {
+  if (!Number.isInteger(value) || value < 1) throw new Error(`Invalid chapter number: ${value}`);
+  return value;
+}
+
 /** Typed client for the Free Use Bible API. Every method maps to one static JSON file. */
 export class BibleApiClient {
   readonly #baseUrl: string;
@@ -45,33 +58,33 @@ export class BibleApiClient {
     return this.get('available_translations.json');
   }
 
-  books(translation: string): Promise<{ translation: Translation; books: TranslationBook[] }> {
-    return this.get(`${translation}/books.json`);
+  async books(translation: string): Promise<{ translation: Translation; books: TranslationBook[] }> {
+    return this.get(`${safeId(translation, 'translation')}/books.json`);
   }
 
-  chapter(translation: string, book: string, chapter: number): Promise<TranslationChapter> {
-    return this.get(`${translation}/${book}/${chapter}.json`);
+  async chapter(translation: string, book: string, chapter: number): Promise<TranslationChapter> {
+    return this.get(`${safeId(translation, 'translation')}/${safeId(book, 'book')}/${safeChapter(chapter)}.json`);
   }
 
   availableCommentaries(): Promise<{ commentaries: Commentary[] }> {
     return this.get('available_commentaries.json');
   }
 
-  commentaryChapter(commentary: string, book: string, chapter: number): Promise<CommentaryChapter> {
-    return this.get(`c/${commentary}/${book}/${chapter}.json`);
+  async commentaryChapter(commentary: string, book: string, chapter: number): Promise<CommentaryChapter> {
+    return this.get(commentaryPath(commentary, book, chapter));
   }
 
   /** Like `commentaryChapter`, but `undefined` when the commentary does not cover the chapter. */
-  tryCommentaryChapter(commentary: string, book: string, chapter: number): Promise<CommentaryChapter | undefined> {
-    return this.tryGet(`c/${commentary}/${book}/${chapter}.json`);
+  async tryCommentaryChapter(commentary: string, book: string, chapter: number): Promise<CommentaryChapter | undefined> {
+    return this.tryGet(commentaryPath(commentary, book, chapter));
   }
 
   availableDatasets(): Promise<{ datasets: Dataset[] }> {
     return this.get('available_datasets.json');
   }
 
-  datasetChapter<T>(dataset: string, book: string, chapter: number): Promise<T> {
-    return this.get(`d/${dataset}/${book}/${chapter}.json`);
+  async datasetChapter<T>(dataset: string, book: string, chapter: number): Promise<T> {
+    return this.get(`d/${safeId(dataset, 'dataset')}/${safeId(book, 'book')}/${safeChapter(chapter)}.json`);
   }
 
   crossReferences(book: string, chapter: number): Promise<CrossReferenceChapter> {
@@ -91,6 +104,7 @@ export class BibleApiClient {
     return value;
   }
 
+  /** Like `get`, but `undefined` on 404. */
   async tryGet<T>(path: string): Promise<T | undefined> {
     try {
       return await this.get<T>(path);
@@ -99,4 +113,8 @@ export class BibleApiClient {
       throw error;
     }
   }
+}
+
+function commentaryPath(commentary: string, book: string, chapter: number): string {
+  return `c/${safeId(commentary, 'commentary')}/${safeId(book, 'book')}/${safeChapter(chapter)}.json`;
 }
