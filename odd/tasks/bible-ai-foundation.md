@@ -14,8 +14,8 @@ Foundation of a Protestant/Evangelical Bible-study ecosystem for AI: a typed cor
 
 ## Tasks
 
-- [ ] **T1** — S2, S5 — inline — Scaffold (TS on Node 24, node:test, git) + Protestant 66-book catalog + reference parser (`src/core/books.ts`, `src/core/reference.ts`). Commit: —
-- [ ] **T2** — S2, S3 — inline — API client with injectable fetch and permanent cache, API types, chapter flattening, passage extraction, cross-references (`src/core/*`). Commit: —
+- [x] **T1** — S2, S5 — inline — Scaffold (TS on Node 24, node:test, git) + Protestant 66-book catalog + reference parser (`src/core/books.ts`, `src/core/reference.ts`). Commit: a61c001
+- [x] **T2** — S2, S3 — inline — API client with injectable fetch and permanent cache, API types, chapter flattening, passage extraction, cross-references (`src/core/*`). Commit: PENDING
 - [ ] **T3** — S4, S7 — inline — Harness contract, shared guardrails, doctrinal profiles (plural default), prompt builder, skill renderer, LLM provider interface + Anthropic adapter (`src/harness/*`). Commit: —
 - [ ] **T4** — S6 — inline — `passage-exegesis` harness (`src/harnesses/passage-exegesis.ts`). Commit: —
 - [ ] **T5** — S6 — inline — `thematic-study` harness over open-cross-ref (`src/harnesses/thematic-study.ts`). Commit: —
