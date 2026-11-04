@@ -10,7 +10,7 @@ import { AnthropicProvider } from '../../src/harness/llm.ts';
 import { fakeFetch } from '../helpers/fake-fetch.ts';
 
 test('FileCache rejects keys that escape its directory and leaves no temp files', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'bible-ai-sec-'));
+  const dir = await mkdtemp(join(tmpdir(), 'biblical-harness-sec-'));
   try {
     const cache = new FileCache(join(dir, 'c'));
     for (const key of ['', '../x', '../../x/JHN/3.json', 'a/../../x']) {
@@ -36,9 +36,9 @@ test('the client rejects unsafe ids before any request', async () => {
 });
 
 test('passage --translation ../ exits 1 without requests or cache writes', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'bible-ai-sec-'));
-  const previous = process.env.BIBLE_AI_CACHE_DIR;
-  process.env.BIBLE_AI_CACHE_DIR = join(dir, 'cache');
+  const dir = await mkdtemp(join(tmpdir(), 'biblical-harness-sec-'));
+  const previous = process.env.BIBLICAL_HARNESS_CACHE_DIR;
+  process.env.BIBLICAL_HARNESS_CACHE_DIR = join(dir, 'cache');
   try {
     const { fetch, calls } = fakeFetch({});
     let err = '';
@@ -52,8 +52,8 @@ test('passage --translation ../ exits 1 without requests or cache writes', async
     assert.match(err, /Invalid translation id "\.\.\/\.\.\/x"/);
     assert.deepEqual(await readdir(dir), []);
   } finally {
-    if (previous === undefined) delete process.env.BIBLE_AI_CACHE_DIR;
-    else process.env.BIBLE_AI_CACHE_DIR = previous;
+    if (previous === undefined) delete process.env.BIBLICAL_HARNESS_CACHE_DIR;
+    else process.env.BIBLICAL_HARNESS_CACHE_DIR = previous;
     await rm(dir, { recursive: true, force: true });
   }
 });
@@ -79,14 +79,14 @@ test('AnthropicProvider redacts the key from transport errors', async () => {
 });
 
 test('an empty XDG_CACHE_HOME falls back to an absolute default', () => {
-  const saved = { xdg: process.env.XDG_CACHE_HOME, own: process.env.BIBLE_AI_CACHE_DIR };
-  delete process.env.BIBLE_AI_CACHE_DIR;
+  const saved = { xdg: process.env.XDG_CACHE_HOME, own: process.env.BIBLICAL_HARNESS_CACHE_DIR };
+  delete process.env.BIBLICAL_HARNESS_CACHE_DIR;
   process.env.XDG_CACHE_HOME = '';
   try {
     assert.ok(isAbsolute(defaultCacheDir()));
   } finally {
     if (saved.xdg === undefined) delete process.env.XDG_CACHE_HOME;
     else process.env.XDG_CACHE_HOME = saved.xdg;
-    if (saved.own !== undefined) process.env.BIBLE_AI_CACHE_DIR = saved.own;
+    if (saved.own !== undefined) process.env.BIBLICAL_HARNESS_CACHE_DIR = saved.own;
   }
 });

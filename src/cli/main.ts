@@ -27,7 +27,7 @@ export interface CliIo {
 class UsageError extends Error {
   readonly hint: string;
 
-  constructor(message: string, hint = 'Run "bible-ai --help" for usage.') {
+  constructor(message: string, hint = 'Run "biblical-harness --help" for usage.') {
     super(message);
     this.name = 'UsageError';
     this.hint = hint;
@@ -55,13 +55,13 @@ interface Command {
 }
 
 const GLOBAL_HELP = [
-  '--no-cache           Keep API responses in memory only (default: file cache, see BIBLE_AI_CACHE_DIR)',
+  '--no-cache           Keep API responses in memory only (default: file cache, see BIBLICAL_HARNESS_CACHE_DIR)',
   '-h, --help           Show help',
 ];
 
 const HARNESS_OPTION_HELP = [
   '--input <json|@file>  Harness input as JSON, or @path to read it from a file (required)',
-  `--profile <id>       Doctrinal profile (default: ${DEFAULT_PROFILE_ID}; see "bible-ai profiles")`,
+  `--profile <id>       Doctrinal profile (default: ${DEFAULT_PROFILE_ID}; see "biblical-harness profiles")`,
   '--lang <code>        Output language (default: es)',
 ];
 const HARNESS_OPTIONS: OptionSpec = {
@@ -82,7 +82,7 @@ function integerOption(values: Values, name: string, fallback: number): number {
 
 function requireArg(positionals: string[], index: number, label: string, command: string): string {
   const value = positionals[index];
-  if (value === undefined) throw new UsageError(`Missing ${label} argument.`, `Run "bible-ai ${command} --help" for usage.`);
+  if (value === undefined) throw new UsageError(`Missing ${label} argument.`, `Run "biblical-harness ${command} --help" for usage.`);
   return value;
 }
 
@@ -100,7 +100,7 @@ function findProfile(id: string): DoctrinalProfile {
 
 async function readInput(values: Values, cwd: string): Promise<unknown> {
   const raw = values.input;
-  if (typeof raw !== 'string') throw new UsageError('--input is required: pass JSON or @path/to/file.json.', 'Run "bible-ai gather --help" for usage.');
+  if (typeof raw !== 'string') throw new UsageError('--input is required: pass JSON or @path/to/file.json.', 'Run "biblical-harness gather --help" for usage.');
   let text = raw;
   if (raw.startsWith('@')) {
     const path = resolve(cwd, raw.slice(1));
@@ -135,7 +135,7 @@ const COMMANDS: Command[] = [
   {
     name: 'passage',
     summary: 'Print the text of a passage',
-    usage: ['bible-ai passage <ref> [--translation <id>] [--json]'],
+    usage: ['biblical-harness passage <ref> [--translation <id>] [--json]'],
     options: { translation: { type: 'string' }, json: { type: 'boolean' } },
     optionHelp: [`--translation <id>  Translation id (default: ${DEFAULT_TRANSLATION})`, '--json              Print the Passage object as JSON'],
     async run({ values, positionals, client, io }) {
@@ -148,7 +148,7 @@ const COMMANDS: Command[] = [
   {
     name: 'xref',
     summary: 'List cross references of a passage (open-cross-ref)',
-    usage: ['bible-ai xref <ref> [--limit <n>] [--min-score <n>] [--json]'],
+    usage: ['biblical-harness xref <ref> [--limit <n>] [--min-score <n>] [--json]'],
     options: { limit: { type: 'string' }, 'min-score': { type: 'string' }, json: { type: 'boolean' } },
     optionHelp: ['--limit <n>        Links kept per verse, strongest first (default: 5)', '--min-score <n>    Drop links voted below this score (default: 0)', '--json             Print the links as JSON'],
     async run({ values, positionals, client, io }) {
@@ -164,7 +164,7 @@ const COMMANDS: Command[] = [
   {
     name: 'translations',
     summary: 'List available translations',
-    usage: ['bible-ai translations [--lang <iso639-3>]'],
+    usage: ['biblical-harness translations [--lang <iso639-3>]'],
     options: { lang: { type: 'string' } },
     optionHelp: ['--lang <code>     Only translations in this language, e.g. spa, eng'],
     async run({ values, client, io }) {
@@ -176,7 +176,7 @@ const COMMANDS: Command[] = [
   {
     name: 'commentaries',
     summary: 'List available commentaries',
-    usage: ['bible-ai commentaries'],
+    usage: ['biblical-harness commentaries'],
     options: {},
     optionHelp: [],
     async run({ client, io }) {
@@ -187,7 +187,7 @@ const COMMANDS: Command[] = [
   {
     name: 'harnesses',
     summary: 'List the available analyses',
-    usage: ['bible-ai harnesses'],
+    usage: ['biblical-harness harnesses'],
     options: {},
     optionHelp: [],
     async run({ io }) {
@@ -197,7 +197,7 @@ const COMMANDS: Command[] = [
   {
     name: 'profiles',
     summary: 'List doctrinal profiles, or show one',
-    usage: ['bible-ai profiles', 'bible-ai profiles show <id>'],
+    usage: ['biblical-harness profiles', 'biblical-harness profiles show <id>'],
     options: {},
     optionHelp: [],
     async run({ positionals, io }) {
@@ -205,7 +205,7 @@ const COMMANDS: Command[] = [
         io.stdout(lines(PROFILES.map((p) => `${p.id}${p.id === DEFAULT_PROFILE_ID ? ' (default)' : ''} | ${p.name} | ${p.nameEs}`)));
         return;
       }
-      if (positionals[0] !== 'show') throw new UsageError(`Unknown profiles subcommand "${positionals[0]}".`, 'Run "bible-ai profiles --help" for usage.');
+      if (positionals[0] !== 'show') throw new UsageError(`Unknown profiles subcommand "${positionals[0]}".`, 'Run "biblical-harness profiles --help" for usage.');
       const profile = findProfile(requireArg(positionals, 1, '<id>', 'profiles'));
       io.stdout(
         lines([
@@ -224,7 +224,7 @@ const COMMANDS: Command[] = [
   {
     name: 'gather',
     summary: 'Print the evidence bundle of a harness as JSON (what skills run)',
-    usage: ['bible-ai gather <harness> --input <json|@file> [--profile <id>] [--lang <code>]'],
+    usage: ['biblical-harness gather <harness> --input <json|@file> [--profile <id>] [--lang <code>]'],
     options: HARNESS_OPTIONS,
     optionHelp: HARNESS_OPTION_HELP,
     async run(context) {
@@ -236,7 +236,7 @@ const COMMANDS: Command[] = [
   {
     name: 'prompt',
     summary: 'Print the pipeline prompt of a harness (dry run, no API key needed)',
-    usage: ['bible-ai prompt <harness> --input <json|@file> [--profile <id>] [--lang <code>]'],
+    usage: ['biblical-harness prompt <harness> --input <json|@file> [--profile <id>] [--lang <code>]'],
     options: HARNESS_OPTIONS,
     optionHelp: HARNESS_OPTION_HELP,
     async run(context) {
@@ -249,9 +249,9 @@ const COMMANDS: Command[] = [
   {
     name: 'run',
     summary: 'Run the pipeline with Anthropic (needs ANTHROPIC_API_KEY) and print the validated report JSON',
-    usage: ['bible-ai run <harness> --input <json|@file> [--profile <id>] [--lang <code>] [--model <id>] [--max-tokens <n>]'],
+    usage: ['biblical-harness run <harness> --input <json|@file> [--profile <id>] [--lang <code>] [--model <id>] [--max-tokens <n>]'],
     options: { ...HARNESS_OPTIONS, model: { type: 'string' }, 'max-tokens': { type: 'string' } },
-    optionHelp: [...HARNESS_OPTION_HELP, '--model <id>        Model id (default: $BIBLE_AI_MODEL, else claude-sonnet-5-5)', '--max-tokens <n>    Maximum output tokens (default: 8000)'],
+    optionHelp: [...HARNESS_OPTION_HELP, '--model <id>        Model id (default: $BIBLICAL_HARNESS_MODEL, else claude-sonnet-5-5)', '--max-tokens <n>    Maximum output tokens (default: 8000)'],
     async run(context) {
       const { harness, input, harnessContext } = await harnessRequest(context, 'run');
       const maxTokens = context.values['max-tokens'] === undefined ? undefined : integerOption(context.values, 'max-tokens', 0);
@@ -263,11 +263,11 @@ const COMMANDS: Command[] = [
   {
     name: 'skills',
     summary: 'Generate the SKILL.md of every harness',
-    usage: ['bible-ai skills build [--out <dir>]'],
+    usage: ['biblical-harness skills build [--out <dir>]'],
     options: { out: { type: 'string' } },
     optionHelp: ['--out <dir>        Output directory (default: skills)'],
     async run({ values, positionals, io }) {
-      if (positionals[0] !== 'build') throw new UsageError('Expected the subcommand "skills build".', 'Run "bible-ai skills --help" for usage.');
+      if (positionals[0] !== 'build') throw new UsageError('Expected the subcommand "skills build".', 'Run "biblical-harness skills --help" for usage.');
       const out = resolve(io.cwd, (values.out as string | undefined) ?? 'skills');
       for (const harness of HARNESSES) {
         const path = join(out, harness.id, 'SKILL.md');
@@ -282,14 +282,14 @@ const COMMANDS: Command[] = [
 function rootHelp(): string {
   const width = Math.max(...COMMANDS.map((c) => c.name.length));
   return lines([
-    'bible-ai: Bible-study harnesses over the Free Use Bible API (https://bible.helloao.org/docs/)',
+    'biblical-harness: Bible-study harnesses over the Free Use Bible API (https://bible.helloao.org/docs/)',
     '',
-    'Usage: bible-ai <command> [options]',
+    'Usage: biblical-harness <command> [options]',
     '',
     'Commands:',
     ...COMMANDS.map((c) => `  ${c.name.padEnd(width)}  ${c.summary}`),
     '',
-    'Run "bible-ai <command> --help" for the options of a command.',
+    'Run "biblical-harness <command> --help" for the options of a command.',
     '',
     'Global options:',
     ...alignRows(GLOBAL_HELP).map((row) => `  ${row}`),
@@ -338,7 +338,7 @@ export async function main(argv: string[], io: CliIo = {}): Promise<number> {
         options: { ...command.options, 'no-cache': { type: 'boolean' }, help: { type: 'boolean', short: 'h' } },
       });
     } catch (error) {
-      throw new UsageError((error as Error).message, `Run "bible-ai ${command.name} --help" for usage.`);
+      throw new UsageError((error as Error).message, `Run "biblical-harness ${command.name} --help" for usage.`);
     }
     if (parsed.values.help) {
       stdout(commandHelp(command));
@@ -355,10 +355,10 @@ export async function main(argv: string[], io: CliIo = {}): Promise<number> {
     return 0;
   } catch (error) {
     if (error instanceof UsageError) {
-      stderr(`bible-ai: ${error.message}\n${error.hint}\n`);
+      stderr(`biblical-harness: ${error.message}\n${error.hint}\n`);
       return 2;
     }
-    stderr(`bible-ai: ${error instanceof Error ? error.message : String(error)}\n`);
+    stderr(`biblical-harness: ${error instanceof Error ? error.message : String(error)}\n`);
     return 1;
   }
 }

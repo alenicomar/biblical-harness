@@ -61,9 +61,9 @@ export class FileCache implements Cache {
   }
 }
 
-/** `$BIBLE_AI_CACHE_DIR`, else `$XDG_CACHE_HOME/bible-ai`, else `~/.cache/bible-ai`. */
+/** `$BIBLICAL_HARNESS_CACHE_DIR`, else `$XDG_CACHE_HOME/biblical-harness`, else `~/.cache/biblical-harness`. */
 export function defaultCacheDir(): string {
-  if (process.env.BIBLE_AI_CACHE_DIR) return process.env.BIBLE_AI_CACHE_DIR;
+  if (process.env.BIBLICAL_HARNESS_CACHE_DIR) return process.env.BIBLICAL_HARNESS_CACHE_DIR;
   const base = process.env.XDG_CACHE_HOME || join(homedir(), '.cache');
-  return join(base, 'bible-ai');
+  return join(base, 'biblical-harness');
 }

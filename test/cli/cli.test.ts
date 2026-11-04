@@ -76,7 +76,7 @@ test('every command answers --help with its usage', async () => {
   for (const name of ['passage', 'xref', 'translations', 'commentaries', 'harnesses', 'profiles', 'gather', 'prompt', 'run', 'skills']) {
     const { code, out, err } = await cli([name, '--help']);
     assert.equal(code, 0, name);
-    assert.match(out, new RegExp(`Usage: bible-ai ${name}`), name);
+    assert.match(out, new RegExp(`Usage: biblical-harness ${name}`), name);
     assert.equal(err, '', name);
   }
 });
@@ -191,7 +191,7 @@ test('gather prints the evidence bundle as pretty JSON', async () => {
 });
 
 test('gather reads --input @file.json relative to the working directory', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'bible-ai-cli-'));
+  const dir = await mkdtemp(join(tmpdir(), 'biblical-harness-cli-'));
   try {
     await writeFile(join(dir, 'input.json'), EXEGESIS_INPUT);
     const { code, out } = await cli(['gather', 'passage-exegesis', '--input', '@input.json'], routes(), {}, dir);
@@ -325,7 +325,7 @@ test('run rejects a reply that does not match the report schema', async () => {
 });
 
 test('skills build writes one SKILL.md per harness into --out', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'bible-ai-skills-'));
+  const dir = await mkdtemp(join(tmpdir(), 'biblical-harness-skills-'));
   try {
     const { code, out } = await cli(['skills', 'build', '--out', dir]);
     assert.equal(code, 0);
@@ -349,7 +349,7 @@ test('unknown commands and options are usage errors', async () => {
   const command = await cli(['frobnicate']);
   assert.equal(command.code, 2);
   assert.match(command.err, /Unknown command "frobnicate"/);
-  assert.match(command.err, /bible-ai --help/);
+  assert.match(command.err, /biblical-harness --help/);
 
   const option = await cli(['passage', 'Jn 3:16', '--verbose']);
   assert.equal(option.code, 2);

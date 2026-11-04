@@ -60,7 +60,7 @@ test('tryCommentaryChapter returns undefined when the commentary lacks the book'
 });
 
 test('FileCache stores entries under its directory and refuses path traversal', async () => {
-  const dir = await mkdtemp(join(tmpdir(), 'bible-ai-cache-'));
+  const dir = await mkdtemp(join(tmpdir(), 'biblical-harness-cache-'));
   try {
     const cache = new FileCache(dir);
     await cache.set('spa_r09/JHN/3.json', '{"ok":true}');

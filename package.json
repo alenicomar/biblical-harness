@@ -1,14 +1,22 @@
 {
-  "name": "bible-ai",
+  "name": "biblical-harness",
   "version": "0.1.0",
   "description": "Protestant/Evangelical Bible-study ecosystem for AI: harnesses over the Free Use Bible API.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alenicomar/biblical-harness.git"
+  },
+  "homepage": "https://github.com/alenicomar/biblical-harness#readme",
+  "bugs": {
+    "url": "https://github.com/alenicomar/biblical-harness/issues"
+  },
   "engines": {
     "node": ">=24"
   },
   "bin": {
-    "bible-ai": "src/cli/main.ts"
+    "biblical-harness": "src/cli/main.ts"
   },
   "scripts": {
     "test": "node --test \"test/**/*.test.ts\"",

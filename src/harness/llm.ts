@@ -13,7 +13,7 @@ export interface LlmProvider {
 export interface AnthropicProviderOptions {
   /** Defaults to `$ANTHROPIC_API_KEY`. */
   apiKey?: string;
-  /** Defaults to `$BIBLE_AI_MODEL`, else `claude-sonnet-5-5`. */
+  /** Defaults to `$BIBLICAL_HARNESS_MODEL`, else `claude-sonnet-5-5`. */
   model?: string;
   baseUrl?: string;
   fetch?: typeof fetch;
@@ -35,7 +35,7 @@ export class AnthropicProvider implements LlmProvider {
     // Header values must be printable ASCII; reject without echoing the key.
     if (!/^[\x21-\x7E]+$/.test(apiKey.trim())) throw new Error('ANTHROPIC_API_KEY contains invalid characters.');
     this.#apiKey = apiKey.trim();
-    this.model = options.model ?? process.env.BIBLE_AI_MODEL ?? DEFAULT_ANTHROPIC_MODEL;
+    this.model = options.model ?? process.env.BIBLICAL_HARNESS_MODEL ?? DEFAULT_ANTHROPIC_MODEL;
     this.#baseUrl = (options.baseUrl ?? 'https://api.anthropic.com').replace(/\/+$/, '');
     this.#fetch = options.fetch ?? globalThis.fetch;
   }

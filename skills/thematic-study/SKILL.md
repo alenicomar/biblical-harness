@@ -5,14 +5,14 @@ description: Use when tracing a theme or doctrine across the canon from seed pas
 
 # Thematic study
 
-<!-- Generated from src/harnesses/thematic-study.ts by `bible-ai skills build`. Do not edit by hand. -->
+<!-- Generated from src/harnesses/thematic-study.ts by `biblical-harness skills build`. Do not edit by hand. -->
 
 ## 1. Gather the evidence
 
 Run the CLI and read its JSON output. Do not answer from memory: every quotation and reference must come from this evidence.
 
 ```sh
-bible-ai gather thematic-study --input '<json>' [--profile <id>] [--lang <code>]
+biblical-harness gather thematic-study --input '<json>' [--profile <id>] [--lang <code>]
 ```
 
 Input (JSON Schema):
@@ -113,7 +113,7 @@ Rules:
 
 ## 4. Apply the doctrinal profile
 
-Use the profile the user asks for; otherwise `plural`. Print its instructions with `bible-ai profiles show <id>`.
+Use the profile the user asks for; otherwise `plural`. Print its instructions with `biblical-harness profiles show <id>`.
 
 - `plural` (default): Evangelical plural (Evangélico plural). Presents the main Protestant readings of disputed points side by side, without taking sides.
 - `reformed`: Reformed / Presbyterian (Reformada / Presbiteriana). Reads Scripture within the Reformed confessions and covenant theology.
