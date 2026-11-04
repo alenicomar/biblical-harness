@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, chmod, lstat, mkdir, readFile, readlink, rm, rmdir, symlink, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { delimiter, dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { FileCache, MemoryCache } from '../core/cache.ts';
 import { BibleApiClient } from '../core/client.ts';
@@ -283,15 +284,68 @@ const COMMANDS: Command[] = [
         subcommand === 'build'
           ? resolve(io.cwd, (values.out as string | undefined) ?? 'skills')
           : resolve(io.cwd, (values.dir as string | undefined) ?? join(homedir(), '.agents', 'skills'));
-      for (const harness of HARNESSES) {
-        const path = join(out, harness.id, 'SKILL.md');
-        await mkdir(dirname(path), { recursive: true });
-        await writeFile(path, renderSkill(harness), 'utf8');
-        io.stdout(`${path}\n`);
+      await writeSkills(out, io.stdout);
+    },
+  },
+  {
+    name: 'setup',
+    summary: 'Install this clone for your user: link the command and install the skills (run by npm install)',
+    usage: ['biblical-harness setup [--bin-dir <dir>] [--skills-dir <dir>] [--remove]'],
+    options: { 'bin-dir': { type: 'string' }, 'skills-dir': { type: 'string' }, remove: { type: 'boolean' } },
+    optionHelp: [
+      '--bin-dir <dir>     Where to link the command (default: $BIBLICAL_HARNESS_BIN_DIR, else ~/.local/bin)',
+      '--skills-dir <dir>  Where to install the skills (default: $BIBLICAL_HARNESS_SKILLS_DIR, else ~/.agents/skills)',
+      '--remove            Remove the link and the installed skills instead',
+    ],
+    async run({ values, io }) {
+      const binDir = resolve(io.cwd, (values['bin-dir'] as string | undefined) || process.env.BIBLICAL_HARNESS_BIN_DIR || join(homedir(), '.local', 'bin'));
+      const skillsDir = resolve(
+        io.cwd,
+        (values['skills-dir'] as string | undefined) || process.env.BIBLICAL_HARNESS_SKILLS_DIR || join(homedir(), '.agents', 'skills'),
+      );
+      const link = join(binDir, 'biblical-harness');
+      const existing = await lstat(link).catch(() => undefined);
+      if (existing && !existing.isSymbolicLink()) throw new Error(`${link} is not a symlink; remove it or pass --bin-dir.`);
+
+      if (values.remove) {
+        if (existing && (await readlink(link)) === CLI_PATH) {
+          await unlink(link);
+          io.stdout(`Removed ${link}\n`);
+        }
+        for (const harness of HARNESSES) {
+          await rm(join(skillsDir, harness.id, 'SKILL.md'), { force: true });
+          await rmdir(join(skillsDir, harness.id)).catch(() => {});
+        }
+        io.stdout(`Removed the skills from ${skillsDir}\n`);
+        return;
       }
+
+      await access(CLI_PATH).catch(() => {
+        throw new Error(`${CLI_PATH} is missing: run "npm run build" first.`);
+      });
+      await chmod(CLI_PATH, 0o755);
+      await mkdir(binDir, { recursive: true });
+      if (existing) await unlink(link);
+      await symlink(CLI_PATH, link);
+      io.stdout(`Linked ${link} -> ${CLI_PATH}\n`);
+      await writeSkills(skillsDir, io.stdout);
+      const onPath = (process.env.PATH ?? '').split(delimiter).some((entry) => entry && resolve(entry) === binDir);
+      if (!onPath) io.stdout(`Note: ${binDir} is not on your PATH; add it to run "biblical-harness".\n`);
     },
   },
 ];
+
+/** The built CLI of this package; `setup` links it. Resolves the same from src/cli and dist/cli. */
+const CLI_PATH = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'dist', 'cli', 'main.js');
+
+async function writeSkills(dir: string, stdout: (text: string) => void): Promise<void> {
+  for (const harness of HARNESSES) {
+    const path = join(dir, harness.id, 'SKILL.md');
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, renderSkill(harness), 'utf8');
+    stdout(`${path}\n`);
+  }
+}
 
 function rootHelp(): string {
   const width = Math.max(...COMMANDS.map((c) => c.name.length));

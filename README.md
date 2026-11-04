@@ -56,25 +56,20 @@ Pass `--profile <id>` (default `plural`). All profiles share the core evangelica
 
 Requires Node ≥ 24.
 
-### Install for your user (no root)
-
-Install into `~/.local`, so the command lands in `~/.local/bin` (add it to `PATH` if your shell lacks it):
+### Install
 
 ```sh
-npm install --global --prefix ~/.local github:alenicomar/biblical-harness
-biblical-harness skills install   # writes the skills to ~/.agents/skills (or --dir <dir>)
-```
-
-From a clone, install the packed tarball instead of `npm link` (which needs write access to npm's global prefix):
-
-```sh
+git clone https://github.com/alenicomar/biblical-harness.git
+cd biblical-harness
 npm install
-npm install --global --prefix ~/.local "$(npm pack --silent)"
 ```
 
-To make `~/.local` the default for every global install, run `npm config set prefix ~/.local` once; plain `npm install --global` then needs no `--prefix`.
+`npm install` also installs the clone for your user, without root:
 
-Update by rerunning the install command; remove with `npm uninstall --global --prefix ~/.local biblical-harness`.
+- links the `biblical-harness` command into `~/.local/bin` (it tells you if that directory is not on your `PATH`);
+- installs the skills into `~/.agents/skills`.
+
+The command runs from the clone, so `git pull` updates it. Redo this step with `npm run setup`, undo it with `npm run teardown`, or skip it with `BIBLICAL_HARNESS_SKIP_SETUP=1 npm install`. It never runs when the package is installed as a dependency, globally, or in CI.
 
 ### Use it
 
@@ -95,6 +90,9 @@ ANTHROPIC_API_KEY=... biblical-harness run passage-exegesis --input @exegesis.js
 | `ANTHROPIC_API_KEY` | `biblical-harness run` (required) |
 | `BIBLICAL_HARNESS_MODEL` | Model for `run` (default `claude-sonnet-5-5`; `--model` overrides) |
 | `BIBLICAL_HARNESS_CACHE_DIR` | Cache directory |
+| `BIBLICAL_HARNESS_BIN_DIR` | Where `npm install` / `npm run setup` links the command (default `~/.local/bin`) |
+| `BIBLICAL_HARNESS_SKILLS_DIR` | Where they install the skills (default `~/.agents/skills`) |
+| `BIBLICAL_HARNESS_SKIP_SETUP` | Set to skip the user install during `npm install` |
 
 ## Adding a harness
 

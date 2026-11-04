@@ -36,7 +36,11 @@ test('committed dist/ matches a fresh build of src/', async () => {
 test('package.json runs the built CLI and ships it without a prepare step', async () => {
   const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
   assert.deepEqual(pkg.bin, { 'biblical-harness': 'dist/cli/main.js' });
-  assert.ok(pkg.files.includes('dist') && pkg.files.includes('skills'));
+  // scripts/ ships because postinstall runs wherever the package is installed.
+  for (const entry of ['dist', 'scripts', 'skills']) assert.ok(pkg.files.includes(entry), entry);
   assert.equal(pkg.scripts.prepare, undefined, 'a prepare script makes `npm install --global github:...` fail');
   assert.equal(pkg.scripts.prepack, 'npm run build');
+  assert.equal(pkg.scripts.postinstall, 'node scripts/postinstall.mjs');
+  const { stdout } = await promisify(execFile)('git', ['ls-files', '--stage', 'dist/cli/main.js'], { cwd: root });
+  assert.match(stdout, /^100755 /, 'dist/cli/main.js must be committed executable: run `npm run build` and commit it.');
 });
