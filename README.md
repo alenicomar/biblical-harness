@@ -101,7 +101,7 @@ ANTHROPIC_API_KEY=... biblical-harness run passage-exegesis --input @exegesis.js
 1. Define it with `defineHarness` in `src/harnesses/<id>.ts`: input and output schemas, method, guardrails, `gather`.
 2. Register it in `src/harnesses/index.ts`.
 3. Test it with the fake fetch in `test/helpers/fake-fetch.ts`.
-4. Run `npm run skills` and commit the generated `skills/<id>/SKILL.md`.
+4. Run `npm run skills` and `npm run build`, and commit the generated `skills/<id>/SKILL.md` and `dist/`.
 
 ## Roadmap
 
@@ -115,7 +115,7 @@ ANTHROPIC_API_KEY=... biblical-harness run passage-exegesis --input @exegesis.js
 ```sh
 npm run check    # typecheck + tests
 npm run skills   # regenerate skills/*/SKILL.md
-npm run build    # compile src/ to dist/ (the installed CLI runs dist/cli/main.js)
+npm run build    # compile src/ to dist/ (committed: the installed CLI runs dist/cli/main.js; a test catches drift)
 node src/cli/main.ts <command>   # run from source without building
 ```
 
