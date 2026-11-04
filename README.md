@@ -10,6 +10,7 @@ A Protestant/Evangelical Bible-study ecosystem for AI. Each analysis is a **harn
 | Harness | `src/harness` | The dual-face contract, shared guardrails, doctrinal profiles, prompt and skill renderers, LLM provider |
 | Harnesses | `src/harnesses` | The analyses themselves, registered in `src/harnesses/index.ts` |
 | CLI | `src/cli` | `biblical-harness`: the way agents and people reach everything above |
+| Build | `dist`, `scripts` | Compiled JS the installed command runs (committed); `postinstall` that sets up the user install |
 | MCP (future) | `src/mcp` | A thin adapter, no new logic: core → MCP tools/resources, harnesses → MCP prompts |
 
 Dependencies point one way: `cli` (and later `mcp`) → `harnesses` → `harness` → `core`.
@@ -29,6 +30,8 @@ Dependencies point one way: `cli` (and later `mcp`) → `harnesses` → `harness
 - **Pipeline**: `biblical-harness run <id> --input '<json>'` gathers the same evidence, asks a model (Anthropic), and validates the JSON report against the harness schema. `biblical-harness prompt` shows the prompt without calling any model.
 
 Both faces share the same input schema, evidence gathering and guardrails. Skills are never edited by hand: run `npm run skills`. A test fails when they drift from the harness definitions.
+
+`npm install` puts the skills in `~/.agents/skills`. For an agent that reads skills elsewhere, copy them there with `biblical-harness skills install --dir <dir>`.
 
 ## Doctrinal profiles
 
