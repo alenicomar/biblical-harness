@@ -275,6 +275,10 @@ const COMMANDS: Command[] = [
       if (subcommand !== 'build' && subcommand !== 'install') {
         throw new UsageError('Expected the subcommand "skills build" or "skills install".', 'Run "biblical-harness skills --help" for usage.');
       }
+      const foreign = subcommand === 'build' ? ['dir', 'install'] : ['out', 'build'];
+      if (values[foreign[0]!] !== undefined) {
+        throw new UsageError(`--${foreign[0]} only applies to "skills ${foreign[1]}".`, 'Run "biblical-harness skills --help" for usage.');
+      }
       const out =
         subcommand === 'build'
           ? resolve(io.cwd, (values.out as string | undefined) ?? 'skills')

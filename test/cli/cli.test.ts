@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { main } from '../../src/cli/main.ts';
@@ -370,6 +370,24 @@ test('skills install defaults to the user skills directory ~/.agents/skills', as
     if (previous === undefined) delete process.env.HOME;
     else process.env.HOME = previous;
     await rm(home, { recursive: true, force: true });
+  }
+});
+
+test('skills rejects the output option of the other subcommand without writing', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'biblical-harness-skills-'));
+  try {
+    for (const [argv, pattern] of [
+      [['skills', 'install', '--out', dir], /--out only applies to "skills build"/],
+      [['skills', 'build', '--dir', dir], /--dir only applies to "skills install"/],
+    ] as const) {
+      const { code, out, err } = await cli([...argv]);
+      assert.equal(code, 2);
+      assert.equal(out, '');
+      assert.match(err, pattern);
+    }
+    assert.deepEqual(await readdir(dir), []);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
   }
 });
 
