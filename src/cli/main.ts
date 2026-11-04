@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { FileCache, MemoryCache } from '../core/cache.ts';
@@ -262,13 +263,22 @@ const COMMANDS: Command[] = [
   },
   {
     name: 'skills',
-    summary: 'Generate the SKILL.md of every harness',
-    usage: ['biblical-harness skills build [--out <dir>]'],
-    options: { out: { type: 'string' } },
-    optionHelp: ['--out <dir>        Output directory (default: skills)'],
+    summary: 'Generate the SKILL.md of every harness, or install them for your agents',
+    usage: ['biblical-harness skills build [--out <dir>]', 'biblical-harness skills install [--dir <dir>]'],
+    options: { out: { type: 'string' }, dir: { type: 'string' } },
+    optionHelp: [
+      '--out <dir>        build: output directory (default: skills)',
+      '--dir <dir>        install: user skills directory (default: ~/.agents/skills)',
+    ],
     async run({ values, positionals, io }) {
-      if (positionals[0] !== 'build') throw new UsageError('Expected the subcommand "skills build".', 'Run "biblical-harness skills --help" for usage.');
-      const out = resolve(io.cwd, (values.out as string | undefined) ?? 'skills');
+      const subcommand = positionals[0];
+      if (subcommand !== 'build' && subcommand !== 'install') {
+        throw new UsageError('Expected the subcommand "skills build" or "skills install".', 'Run "biblical-harness skills --help" for usage.');
+      }
+      const out =
+        subcommand === 'build'
+          ? resolve(io.cwd, (values.out as string | undefined) ?? 'skills')
+          : resolve(io.cwd, (values.dir as string | undefined) ?? join(homedir(), '.agents', 'skills'));
       for (const harness of HARNESSES) {
         const path = join(out, harness.id, 'SKILL.md');
         await mkdir(dirname(path), { recursive: true });

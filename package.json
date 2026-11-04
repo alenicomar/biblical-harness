@@ -16,9 +16,11 @@
     "node": ">=24"
   },
   "bin": {
-    "biblical-harness": "src/cli/main.ts"
+    "biblical-harness": "dist/cli/main.js"
   },
   "scripts": {
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
     "test": "node --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "skills": "node src/cli/main.ts skills build",
@@ -30,5 +32,11 @@
   "devDependencies": {
     "@types/node": "^24.19.2",
     "typescript": "^7.0.2"
-  }
+  },
+  "files": [
+    "dist",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ]
 }

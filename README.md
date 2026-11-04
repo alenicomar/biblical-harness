@@ -56,10 +56,29 @@ Pass `--profile <id>` (default `plural`). All profiles share the core evangelica
 
 Requires Node ≥ 24.
 
+### Install for your user (no root)
+
+Install into `~/.local`, so the command lands in `~/.local/bin` (add it to `PATH` if your shell lacks it):
+
+```sh
+npm install --global --prefix ~/.local github:alenicomar/biblical-harness
+biblical-harness skills install   # writes the skills to ~/.agents/skills (or --dir <dir>)
+```
+
+From a clone, install the packed tarball instead of `npm link` (which needs write access to npm's global prefix):
+
 ```sh
 npm install
-npm link                      # optional: exposes `biblical-harness`; otherwise use `node src/cli/main.ts`
+npm install --global --prefix ~/.local "$(npm pack --silent)"
+```
 
+To make `~/.local` the default for every global install, run `npm config set prefix ~/.local` once; plain `npm install --global` then needs no `--prefix`.
+
+Update by rerunning the install command; remove with `npm uninstall --global --prefix ~/.local biblical-harness`.
+
+### Use it
+
+```sh
 biblical-harness passage "Jn 3:16-18"
 biblical-harness xref "Ro 8:28" --limit 3
 biblical-harness gather passage-exegesis --input '{"reference":"Ro 8:28-39"}'
@@ -96,6 +115,8 @@ ANTHROPIC_API_KEY=... biblical-harness run passage-exegesis --input @exegesis.js
 ```sh
 npm run check    # typecheck + tests
 npm run skills   # regenerate skills/*/SKILL.md
+npm run build    # compile src/ to dist/ (the installed CLI runs dist/cli/main.js)
+node src/cli/main.ts <command>   # run from source without building
 ```
 
 TypeScript runs directly on Node 24 (native type stripping): relative imports use `.ts` extensions and only erasable syntax is allowed.

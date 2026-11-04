@@ -339,10 +339,46 @@ test('skills build writes one SKILL.md per harness into --out', async () => {
   }
 });
 
-test('skills without the build subcommand is a usage error', async () => {
-  const { code, err } = await cli(['skills']);
-  assert.equal(code, 2);
-  assert.match(err, /skills build/);
+test('skills install writes one SKILL.md per harness into --dir', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'biblical-harness-skills-'));
+  try {
+    const { code, out } = await cli(['skills', 'install', '--dir', dir]);
+    assert.equal(code, 0);
+    for (const harness of HARNESSES) {
+      const path = join(dir, harness.id, 'SKILL.md');
+      assert.equal(await readFile(path, 'utf8'), renderSkill(harness));
+      assert.ok(out.includes(path));
+    }
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('skills install defaults to the user skills directory ~/.agents/skills', async () => {
+  const home = await mkdtemp(join(tmpdir(), 'biblical-harness-home-'));
+  const previous = process.env.HOME;
+  process.env.HOME = home;
+  try {
+    const { code, out } = await cli(['skills', 'install']);
+    assert.equal(code, 0);
+    for (const harness of HARNESSES) {
+      const path = join(home, '.agents', 'skills', harness.id, 'SKILL.md');
+      assert.equal(await readFile(path, 'utf8'), renderSkill(harness));
+      assert.ok(out.includes(path));
+    }
+  } finally {
+    if (previous === undefined) delete process.env.HOME;
+    else process.env.HOME = previous;
+    await rm(home, { recursive: true, force: true });
+  }
+});
+
+test('skills without a known subcommand is a usage error', async () => {
+  for (const argv of [['skills'], ['skills', 'publish']]) {
+    const { code, err } = await cli(argv);
+    assert.equal(code, 2);
+    assert.match(err, /"skills build" or "skills install"/);
+  }
 });
 
 test('unknown commands and options are usage errors', async () => {
