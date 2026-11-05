@@ -87,6 +87,31 @@ export class BibleApiClient {
     return this.get(`d/${safeId(dataset, 'dataset')}/${safeId(book, 'book')}/${safeChapter(chapter)}.json`);
   }
 
+  /** Like `datasetChapter`, but `undefined` when the dataset does not cover the chapter. */
+  async tryDatasetChapter<T>(dataset: string, book: string, chapter: number): Promise<T | undefined> {
+    return this.tryGet(`d/${safeId(dataset, 'dataset')}/${safeId(book, 'book')}/${safeChapter(chapter)}.json`);
+  }
+
+  /** A lexicon entry by padded Strong's id, e.g. `lexiconEntry('stepbible-lexicon', 'G0025')`. */
+  async lexiconEntry<T>(dataset: string, strongs: string): Promise<T> {
+    return this.get(`d/${safeId(dataset, 'dataset')}/lexicon/${safeId(strongs, "Strong's")}.json`);
+  }
+
+  /** Like `lexiconEntry`, but `undefined` when the lexicon has no such entry. */
+  async tryLexiconEntry<T>(dataset: string, strongs: string): Promise<T | undefined> {
+    return this.tryGet(`d/${safeId(dataset, 'dataset')}/lexicon/${safeId(strongs, "Strong's")}.json`);
+  }
+
+  /** A dataset-wide list, e.g. `datasetIndex('theographic', 'people')` for `d/theographic/people.json`. */
+  async datasetIndex<T>(dataset: string, index: string): Promise<T> {
+    return this.get(`d/${safeId(dataset, 'dataset')}/${safeId(index, 'index')}.json`);
+  }
+
+  /** One entity of a dataset, e.g. `datasetEntity('theographic', 'people', 'paul_2479')`. */
+  async datasetEntity<T>(dataset: string, kind: string, id: string): Promise<T> {
+    return this.get(`d/${safeId(dataset, 'dataset')}/${safeId(kind, 'entity kind')}/${safeId(id, 'entity')}.json`);
+  }
+
   crossReferences(book: string, chapter: number): Promise<CrossReferenceChapter> {
     return this.datasetChapter('open-cross-ref', book, chapter);
   }

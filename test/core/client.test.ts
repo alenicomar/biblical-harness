@@ -40,6 +40,30 @@ test('builds commentary and dataset paths', async () => {
   ]);
 });
 
+test('builds lexicon, dataset index and dataset entity paths', async () => {
+  const fake = fakeFetch({
+    '/api/d/stepbible-lexicon/lexicon/G0025.json': { entry: { id: 'G0025' } },
+    '/api/d/theographic/people.json': { people: [] },
+    '/api/d/theographic/events/second-missionary-journey_345.json': { event: { id: 'x' } },
+  });
+  const client = new BibleApiClient({ fetch: fake.fetch });
+
+  assert.deepEqual(await client.lexiconEntry('stepbible-lexicon', 'G0025'), { entry: { id: 'G0025' } });
+  assert.deepEqual(await client.datasetIndex('theographic', 'people'), { people: [] });
+  assert.deepEqual(await client.datasetEntity('theographic', 'events', 'second-missionary-journey_345'), { event: { id: 'x' } });
+  assert.equal(await client.tryLexiconEntry('stepbible-lexicon', 'G9999'), undefined);
+  await assert.rejects(client.datasetEntity('theographic', 'people', '../x'), /Invalid entity id/);
+  await assert.rejects(client.datasetIndex('theographic', 'a/b'), /Invalid index id/);
+  await assert.rejects(client.lexiconEntry('stepbible-lexicon', '../G1'), /Invalid Strong's id/);
+
+  assert.deepEqual(fake.calls, [
+    'https://bible.helloao.org/api/d/stepbible-lexicon/lexicon/G0025.json',
+    'https://bible.helloao.org/api/d/theographic/people.json',
+    'https://bible.helloao.org/api/d/theographic/events/second-missionary-journey_345.json',
+    'https://bible.helloao.org/api/d/stepbible-lexicon/lexicon/G9999.json',
+  ]);
+});
+
 test('throws BibleApiError with status and path on HTTP failure, without caching it', async () => {
   const fake = fakeFetch({}, { '/api/spa_r09/books.json': 503 });
   const cache = new MemoryCache();
