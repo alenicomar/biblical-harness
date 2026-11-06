@@ -43,7 +43,7 @@ Input (JSON Schema):
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "English name as Theographic spells it, e.g. \"David\", \"Bethlehem\", \"Philippi\", \"The Exodus\" (translate Spanish names: Belén → Bethlehem, Pedro → Peter). Accents and case are ignored."
+          "description": "Name of the person, place, event or group, e.g. \"David\", \"Bethlehem\", \"Philippi\", \"The Exodus\". Theographic spells names in English; common Spanish names (Belén, Pedro, Pablo…) are translated automatically, other Spanish names must be given in English. Accents and case are ignored."
         }
       },
       "required": [

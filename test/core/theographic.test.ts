@@ -157,6 +157,16 @@ test('searchEntities matches alsoCalled for people when the index provides it', 
   assert.deepEqual((await searchEntities(api, 'person', 'Jedidiah')).map((p) => p.id), ['solomon_6']);
 });
 
+test('searchEntities falls back to the English spelling of a common Spanish name', async () => {
+  const { api } = client({
+    '/api/d/theographic/places.json': { places: [{ id: 'bethlehem_1', name: 'Bethlehem', numberOfReferences: 40 }] },
+    '/api/d/theographic/people.json': peopleIndex,
+  });
+  assert.deepEqual((await searchEntities(api, 'place', 'Belén')).map((p) => p.id), ['bethlehem_1']);
+  assert.deepEqual((await searchEntities(api, 'person', 'Davíd')).map((p) => p.id).slice(0, 2), ['david_1', 'david_2']);
+  assert.deepEqual(await searchEntities(api, 'place', 'Atlantida'), []);
+});
+
 test('searchEntities reads the index of each kind', async () => {
   const { api, calls } = client({
     '/api/d/theographic/places.json': { places: [{ id: 'bethlehem_1', name: 'Bethlehem', numberOfReferences: 40 }] },

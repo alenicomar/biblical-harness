@@ -345,13 +345,13 @@ test('entity mode throws naming the kind and the name when nothing matches', asy
   const fake = fakeFetch(entityRoutes());
   await assert.rejects(
     gatherEvidence(peoplePlacesTimeline, { entity: { kind: 'person', name: 'Zzyzx' } }, context(fake.fetch)),
-    /No person matches "Zzyzx" in Theographic\. Names are in English \(e\.g\. "Bethlehem", "Peter"\)/,
+    /No person matches "Zzyzx" in Theographic\. Theographic names are in English \(e\.g\. "Bethlehem", "Peter"\)/,
   );
 });
 
 test('entity names are documented as English in the input schema', async () => {
   const { renderSkill } = await import('../../src/harness/skill.ts');
-  assert.match(renderSkill(peoplePlacesTimeline), /English name as Theographic spells it/);
+  assert.match(renderSkill(peoplePlacesTimeline), /Theographic spells names in English; common Spanish names/);
 });
 
 test('entity mode for an event lists participants and locations', async () => {

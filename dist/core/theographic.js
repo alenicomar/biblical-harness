@@ -1,5 +1,6 @@
 import { findBook } from './books.js';
 import { chaptersOf, containsVerse, formatReference } from './reference.js';
+import { spanishToEnglishName } from './spanish-names.js';
 export const THEOGRAPHIC = 'theographic';
 export const HISTORY_GLOBE = 'history-globe';
 /** Directory (and index file) name of each entity kind in the dataset. */
@@ -69,6 +70,13 @@ export async function searchEntities(client, kind, name, options = {}) {
     const query = normalizeName(name);
     if (query === '')
         return [];
+    const found = await searchIndex(client, kind, query, options.limit ?? 10);
+    if (found.length > 0)
+        return found;
+    const english = spanishToEnglishName(name);
+    return english === undefined ? [] : searchIndex(client, kind, normalizeName(english), options.limit ?? 10);
+}
+async function searchIndex(client, kind, query, limit) {
     const collection = COLLECTION[kind];
     const index = await client.datasetIndex(THEOGRAPHIC, collection);
     const matches = [];
@@ -79,7 +87,7 @@ export async function searchEntities(client, kind, name, options = {}) {
             matches.push({ item, tier });
     }
     matches.sort((a, b) => a.tier - b.tier || (b.item.numberOfReferences ?? 0) - (a.item.numberOfReferences ?? 0));
-    return matches.slice(0, options.limit ?? 10).map((match) => match.item);
+    return matches.slice(0, limit).map((match) => match.item);
 }
 /** The History Globe place index. */
 export async function loadHistoryGlobeIndex(client) {

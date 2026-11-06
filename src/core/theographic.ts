@@ -2,6 +2,7 @@ import { findBook } from './books.ts';
 import type { BibleApiClient } from './client.ts';
 import type { VerseLocation } from './passage.ts';
 import { chaptersOf, containsVerse, formatReference, type PassageRef } from './reference.ts';
+import { spanishToEnglishName } from './spanish-names.ts';
 
 export const THEOGRAPHIC = 'theographic';
 export const HISTORY_GLOBE = 'history-globe';
@@ -237,6 +238,18 @@ export async function searchEntities<K extends EntityKind>(
 ): Promise<Array<IndexItems[K]>> {
   const query = normalizeName(name);
   if (query === '') return [];
+  const found = await searchIndex(client, kind, query, options.limit ?? 10);
+  if (found.length > 0) return found;
+  const english = spanishToEnglishName(name);
+  return english === undefined ? [] : searchIndex(client, kind, normalizeName(english), options.limit ?? 10);
+}
+
+async function searchIndex<K extends EntityKind>(
+  client: BibleApiClient,
+  kind: K,
+  query: string,
+  limit: number,
+): Promise<Array<IndexItems[K]>> {
   const collection = COLLECTION[kind];
   const index = await client.datasetIndex<Record<string, Array<IndexItems[K]>>>(THEOGRAPHIC, collection);
 
@@ -247,7 +260,7 @@ export async function searchEntities<K extends EntityKind>(
     if (tier !== undefined) matches.push({ item, tier });
   }
   matches.sort((a, b) => a.tier - b.tier || (b.item.numberOfReferences ?? 0) - (a.item.numberOfReferences ?? 0));
-  return matches.slice(0, options.limit ?? 10).map((match) => match.item);
+  return matches.slice(0, limit).map((match) => match.item);
 }
 
 /** The History Globe place index. */
