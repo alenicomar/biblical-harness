@@ -1,7 +1,12 @@
 import { passageExegesis } from './passage-exegesis.js';
 import { thematicStudy } from './thematic-study.js';
+import { wordStudy } from './word-study.js';
 /** Every harness the CLI, the skill generator and (later) the MCP server expose. */
-export const HARNESSES = [passageExegesis, thematicStudy];
+export const HARNESSES = [
+    passageExegesis,
+    thematicStudy,
+    wordStudy,
+];
 export function getHarness(id) {
     const harness = HARNESSES.find((h) => h.id === id);
     if (!harness)
