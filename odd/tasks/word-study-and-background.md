@@ -14,7 +14,7 @@ Two new harnesses built in parallel on the existing contract: a Hebrew/Greek wor
 - [x] **T1** — S2 — inline — Client accessors for lexicon entries and dataset indexes/entities (`src/core/client.ts`). Commit: ea9ebfe
 - [x] **T2** — S1, S3 — worker A — `word-study` harness + `src/core/interlinear.ts`. Commit: 57481f9
 - [x] **T3** — S1, S4 — worker B — `people-places-timeline` harness + `src/core/theographic.ts`. Commit: b777761
-- [x] **T4** — S1, S2 — inline — Integration: register both, regenerate skills and dist, README, live smoke. Commit: PENDING
+- [x] **T4** — S1, S2 — inline — Integration: register both, regenerate skills and dist, README, live smoke. Commit: 68fcacd (README) after 57481f9, b777761
 
 ## Log
 
