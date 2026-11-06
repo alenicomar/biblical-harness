@@ -1,6 +1,6 @@
 ---
 name: people-places-timeline
-description: Use when studying the people, places and events of a passage, or one biblical person, place or event: who they are, where (with coordinates), when (timeline) and how they relate, from Theographic and History Globe.
+description: "Use when studying the people, places and events of a passage, or one biblical person, place or event: who they are, where (with coordinates), when (timeline) and how they relate, from Theographic and History Globe."
 ---
 
 # People, places and timeline

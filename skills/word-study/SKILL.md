@@ -1,6 +1,6 @@
 ---
 name: word-study
-description: Use when studying a Hebrew or Greek word of a passage (or a Strong's number): its lexical meaning, semantic range, usage across the book or testament and how translations render it, avoiding word-study fallacies.
+description: "Use when studying a Hebrew or Greek word of a passage (or a Strong's number): its lexical meaning, semantic range, usage across the book or testament and how translations render it, avoiding word-study fallacies."
 ---
 
 # Word study

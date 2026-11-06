@@ -1,6 +1,6 @@
 ---
 name: thematic-study
-description: Use when tracing a theme or doctrine across the canon from seed passages via cross references: how it is introduced, developed and fulfilled from Law to Apocalypse, with Christ at the centre.
+description: "Use when tracing a theme or doctrine across the canon from seed passages via cross references: how it is introduced, developed and fulfilled from Law to Apocalypse, with Christ at the centre."
 ---
 
 # Thematic study
