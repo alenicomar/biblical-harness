@@ -21,6 +21,8 @@ Dependencies point one way: `cli` (and later `mcp`) → `harnesses` → `harness
 | --- | --- |
 | `passage-exegesis` | Study a passage: literary context, structure, original text, classic commentaries, cross references, application |
 | `thematic-study` | Trace a theme or doctrine through the canon from seed passages, via cross references |
+| `word-study` | Study a Hebrew or Greek word of a passage (or a Strong's number): lexicon, semantic range, occurrences, renderings |
+| `people-places-timeline` | Study the people, places and events of a passage, or one person, place, event or group: relations, coordinates, timeline |
 
 `biblical-harness harnesses` lists them.
 
@@ -52,6 +54,8 @@ Pass `--profile <id>` (default `plural`). All profiles share the core evangelica
 - Default translation: `spa_r09` (Reina-Valera 1909). RVR1960 is not available in the API. Other texts: `biblical-harness translations --lang spa`.
 - Commentaries are in English (`biblical-harness commentaries`). Reports are still written in the requested language (`--lang`, default `es`).
 - The API has no full-text search, so a thematic study needs seed passages you choose.
+- `word-study` counts occurrences by scanning interlinear chapters: a book is quick, a whole testament fetches hundreds of chapters on the first run (about 90 s for the OT), then it is cached. Lexicon definitions are in English.
+- `people-places-timeline` looks names up in English, as Theographic spells them (`Bethlehem`, `Peter`). Its dates follow one chronology and are approximate, and its descriptions come from Easton's Bible Dictionary (1897).
 - Responses are immutable, so they are cached forever in `$BIBLICAL_HARNESS_CACHE_DIR`, else `$XDG_CACHE_HOME/biblical-harness`, else `~/.cache/biblical-harness`. Use `--no-cache` to skip the disk.
 - Each text and dataset keeps its own license; check it before redistributing.
 
@@ -81,6 +85,9 @@ biblical-harness passage "Jn 3:16-18"
 biblical-harness xref "Ro 8:28" --limit 3
 biblical-harness gather passage-exegesis --input '{"reference":"Ro 8:28-39"}'
 biblical-harness prompt thematic-study --input '{"theme":"justificación por la fe","seeds":["Ro 3:21-26","Gá 2:16"]}' --profile reformed
+biblical-harness gather word-study --input '{"reference":"Jn 3:16","word":"loved"}'
+biblical-harness gather people-places-timeline --input '{"reference":"Hch 16:1-15"}'
+biblical-harness gather people-places-timeline --input '{"entity":{"kind":"place","name":"Bethlehem"}}'
 ANTHROPIC_API_KEY=... biblical-harness run passage-exegesis --input @exegesis.json --profile baptist
 ```
 
@@ -107,9 +114,7 @@ ANTHROPIC_API_KEY=... biblical-harness run passage-exegesis --input @exegesis.js
 ## Roadmap
 
 - MCP server over the same core and harnesses.
-- Word study with `bsb-interlinear` and `stepbible-lexicon`.
-- People, places and chronology with `theographic` and `history-globe`.
-- Packaging and a build step.
+- Spanish names for `people-places-timeline` lookups.
 
 ## Development
 
