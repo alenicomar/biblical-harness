@@ -1,5 +1,6 @@
 import type { AnyHarness } from '../harness/contract.ts';
 import { passageExegesis } from './passage-exegesis.ts';
+import { peoplePlacesTimeline } from './people-places-timeline.ts';
 import { thematicStudy } from './thematic-study.ts';
 import { wordStudy } from './word-study.ts';
 
@@ -8,6 +9,7 @@ export const HARNESSES: readonly AnyHarness[] = [
   passageExegesis as AnyHarness,
   thematicStudy as AnyHarness,
   wordStudy as AnyHarness,
+  peoplePlacesTimeline as AnyHarness,
 ];
 
 export function getHarness(id: string): AnyHarness {
