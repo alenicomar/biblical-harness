@@ -1,31 +1,31 @@
-import { normalizeName } from './theographic.js';
+import { normalizeName } from './names.js';
 /**
- * Common Spanish (RV) biblical names -> the English spelling Theographic uses.
- * Keys are stored normalized (lowercase, no diacritics). Only names that differ
- * from the English spelling are listed; identical ones (David, Moses→Moses) need no entry.
+ * Spanish (RV) biblical names whose spelling differs from the English one Theographic uses,
+ * mapped to that English spelling. Keys are stored normalized (lowercase, no diacritics).
+ * Names spelled the same in both languages (David, Abraham, Moab) are deliberately absent:
+ * an unlisted name returns undefined and callers search for it as written.
  */
 const SPANISH_TO_ENGLISH = {
     // people
-    adan: 'Adam', eva: 'Eve', cain: 'Cain', abel: 'Abel', noe: 'Noah', abraham: 'Abraham', sara: 'Sarah',
-    agar: 'Hagar', ismael: 'Ishmael', isaac: 'Isaac', rebeca: 'Rebekah', jacob: 'Jacob', esau: 'Esau',
-    lea: 'Leah', raquel: 'Rachel', jose: 'Joseph', moises: 'Moses', aaron: 'Aaron', miriam: 'Miriam',
-    josue: 'Joshua', caleb: 'Caleb', gedeon: 'Gideon', sanson: 'Samson', rut: 'Ruth', noemi: 'Naomi',
-    booz: 'Boaz', samuel: 'Samuel', saul: 'Saul', jonatan: 'Jonathan', salomon: 'Solomon', elias: 'Elijah',
-    eliseo: 'Elisha', isaias: 'Isaiah', jeremias: 'Jeremiah', ezequiel: 'Ezekiel', daniel: 'Daniel',
-    jonas: 'Jonah', ester: 'Esther', job: 'Job', esdras: 'Ezra', nehemias: 'Nehemiah', david: 'David',
-    maria: 'Mary', jesus: 'Jesus', juan: 'John', pedro: 'Peter', santiago: 'James', andres: 'Andrew',
-    felipe: 'Philip', bartolome: 'Bartholomew', mateo: 'Matthew', tomas: 'Thomas', judas: 'Judas',
-    simon: 'Simon', pablo: 'Paul', bernabe: 'Barnabas', timoteo: 'Timotheus', tito: 'Titus',
+    adan: 'Adam', eva: 'Eve', noe: 'Noah', sara: 'Sarah', agar: 'Hagar', ismael: 'Ishmael',
+    rebeca: 'Rebekah', lea: 'Leah', raquel: 'Rachel', jose: 'Joseph', moises: 'Moses',
+    josue: 'Joshua', gedeon: 'Gideon', sanson: 'Samson', rut: 'Ruth', noemi: 'Naomi',
+    booz: 'Boaz', jonatan: 'Jonathan', salomon: 'Solomon', elias: 'Elijah',
+    eliseo: 'Elisha', isaias: 'Isaiah', jeremias: 'Jeremiah', ezequiel: 'Ezekiel',
+    jonas: 'Jonah', ester: 'Esther', esdras: 'Ezra', nehemias: 'Nehemiah',
+    maria: 'Mary', juan: 'John', pedro: 'Peter', santiago: 'James', andres: 'Andrew',
+    felipe: 'Philip', bartolome: 'Bartholomew', mateo: 'Matthew', tomas: 'Thomas',
+    pablo: 'Paul', bernabe: 'Barnabas', timoteo: 'Timotheus', tito: 'Titus',
     lucas: 'Luke', marcos: 'Mark', esteban: 'Stephen', lidia: 'Lydia', priscila: 'Priscilla',
-    aquila: 'Aquila', apolos: 'Apollos', lazaro: 'Lazarus', marta: 'Martha', nicodemo: 'Nicodemus',
+    apolos: 'Apollos', lazaro: 'Lazarus', marta: 'Martha', nicodemo: 'Nicodemus',
     herodes: 'Herod', pilato: 'Pilate', caifas: 'Caiaphas',
     // places
     belen: 'Bethlehem', jerusalen: 'Jerusalem', egipto: 'Egypt', babilonia: 'Babylon', nazaret: 'Nazareth',
-    galilea: 'Galilee', judea: 'Judea', samaria: 'Samaria', damasco: 'Damascus', roma: 'Rome',
+    galilea: 'Galilee', damasco: 'Damascus', roma: 'Rome',
     corinto: 'Corinth', efeso: 'Ephesus', filipos: 'Philippi', tesalonica: 'Thessalonica', atenas: 'Athens',
-    antioquia: 'Antioch', jerico: 'Jericho', hebron: 'Hebron', sion: 'Zion', 'monte sinai': 'Sinai',
-    sinai: 'Sinai', edom: 'Edom', moab: 'Moab', asiria: 'Assyria', persia: 'Persia', grecia: 'Greece',
-    'mar rojo': 'Red Sea', 'rio jordan': 'Jordan', jordan: 'Jordan', capernaum: 'Capernaum', patmos: 'Patmos',
+    antioquia: 'Antioch', jerico: 'Jericho', sion: 'Zion', 'monte sinai': 'Sinai',
+    asiria: 'Assyria', grecia: 'Greece',
+    'mar rojo': 'Red Sea', 'rio jordan': 'Jordan',
     // events / groups
     exodo: 'The Exodus', diluvio: 'The Flood', fariseos: 'Pharisees', saduceos: 'Sadducees',
 };
