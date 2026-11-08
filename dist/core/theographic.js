@@ -1,4 +1,5 @@
 import { findBook } from './books.js';
+import { normalizeName } from './names.js';
 import { chaptersOf, containsVerse, formatReference } from './reference.js';
 import { spanishToEnglishName } from './spanish-names.js';
 export const THEOGRAPHIC = 'theographic';
@@ -46,10 +47,7 @@ export async function getEvent(client, id) {
 export async function getGroup(client, id) {
     return (await client.datasetEntity(THEOGRAPHIC, COLLECTION.group, id)).group;
 }
-/** Lowercase, diacritics stripped, whitespace collapsed: "  José  " -> "jose". */
-export function normalizeName(name) {
-    return name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
-}
+export { normalizeName };
 /** 0 exact, 1 prefix, 2 substring, undefined when no name matches. */
 function matchTier(names, query) {
     let best;
@@ -65,18 +63,40 @@ function matchTier(names, query) {
  * Index items of one kind whose name matches, accent- and case-insensitively: exact
  * matches first, then prefix, then substring; ties by number of references, most
  * attested first. People also match `alsoCalled` when the index carries it.
+ *
+ * A Spanish name with a known English spelling (see `spanishToEnglishName`) is also
+ * searched under that spelling, so "José" is not shadowed by a partial hit such as
+ * "Joses". Precedence: exact matches of the name as typed, then every match of the
+ * English spelling (ranked as above), then the remaining matches of the name as
+ * typed. Each item appears once; `limit` (default 10) caps the whole list. Without
+ * a translation only the name as typed is searched.
  */
 export async function searchEntities(client, kind, name, options = {}) {
     const query = normalizeName(name);
     if (query === '')
         return [];
-    const found = await searchIndex(client, kind, query, options.limit ?? 10);
-    if (found.length > 0)
-        return found;
+    const limit = options.limit ?? 10;
+    const direct = await searchIndex(client, kind, query);
     const english = spanishToEnglishName(name);
-    return english === undefined ? [] : searchIndex(client, kind, normalizeName(english), options.limit ?? 10);
+    const translatedQuery = english === undefined ? query : normalizeName(english);
+    const translated = translatedQuery === query ? [] : await searchIndex(client, kind, translatedQuery);
+    const ranked = [
+        ...direct.filter((match) => match.tier === 0),
+        ...translated,
+        ...direct.filter((match) => match.tier !== 0),
+    ];
+    const seen = new Set();
+    const items = [];
+    for (const { item } of ranked) {
+        if (seen.has(item.id))
+            continue;
+        seen.add(item.id);
+        items.push(item);
+    }
+    return items.slice(0, limit);
 }
-async function searchIndex(client, kind, query, limit) {
+/** Every item of the index whose name matches the normalized query, best match first. */
+async function searchIndex(client, kind, query) {
     const collection = COLLECTION[kind];
     const index = await client.datasetIndex(THEOGRAPHIC, collection);
     const matches = [];
@@ -87,7 +107,7 @@ async function searchIndex(client, kind, query, limit) {
             matches.push({ item, tier });
     }
     matches.sort((a, b) => a.tier - b.tier || (b.item.numberOfReferences ?? 0) - (a.item.numberOfReferences ?? 0));
-    return matches.slice(0, limit).map((match) => match.item);
+    return matches;
 }
 /** The History Globe place index. */
 export async function loadHistoryGlobeIndex(client) {

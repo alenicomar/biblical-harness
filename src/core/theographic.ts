@@ -1,5 +1,6 @@
 import { findBook } from './books.ts';
 import type { BibleApiClient } from './client.ts';
+import { normalizeName } from './names.ts';
 import type { VerseLocation } from './passage.ts';
 import { chaptersOf, containsVerse, formatReference, type PassageRef } from './reference.ts';
 import { spanishToEnglishName } from './spanish-names.ts';
@@ -209,10 +210,7 @@ export async function getGroup(client: BibleApiClient, id: string): Promise<Theo
   return (await client.datasetEntity<{ group: TheographicGroup }>(THEOGRAPHIC, COLLECTION.group, id)).group;
 }
 
-/** Lowercase, diacritics stripped, whitespace collapsed: "  José  " -> "jose". */
-export function normalizeName(name: string): string {
-  return name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
-}
+export { normalizeName };
 
 /** 0 exact, 1 prefix, 2 substring, undefined when no name matches. */
 function matchTier(names: readonly string[], query: string): number | undefined {
@@ -229,6 +227,13 @@ function matchTier(names: readonly string[], query: string): number | undefined 
  * Index items of one kind whose name matches, accent- and case-insensitively: exact
  * matches first, then prefix, then substring; ties by number of references, most
  * attested first. People also match `alsoCalled` when the index carries it.
+ *
+ * A Spanish name with a known English spelling (see `spanishToEnglishName`) is also
+ * searched under that spelling, so "José" is not shadowed by a partial hit such as
+ * "Joses". Precedence: exact matches of the name as typed, then every match of the
+ * English spelling (ranked as above), then the remaining matches of the name as
+ * typed. Each item appears once; `limit` (default 10) caps the whole list. Without
+ * a translation only the name as typed is searched.
  */
 export async function searchEntities<K extends EntityKind>(
   client: BibleApiClient,
@@ -238,18 +243,33 @@ export async function searchEntities<K extends EntityKind>(
 ): Promise<Array<IndexItems[K]>> {
   const query = normalizeName(name);
   if (query === '') return [];
-  const found = await searchIndex(client, kind, query, options.limit ?? 10);
-  if (found.length > 0) return found;
+  const limit = options.limit ?? 10;
+  const direct = await searchIndex(client, kind, query);
   const english = spanishToEnglishName(name);
-  return english === undefined ? [] : searchIndex(client, kind, normalizeName(english), options.limit ?? 10);
+  const translatedQuery = english === undefined ? query : normalizeName(english);
+  const translated = translatedQuery === query ? [] : await searchIndex(client, kind, translatedQuery);
+
+  const ranked = [
+    ...direct.filter((match) => match.tier === 0),
+    ...translated,
+    ...direct.filter((match) => match.tier !== 0),
+  ];
+  const seen = new Set<string>();
+  const items: Array<IndexItems[K]> = [];
+  for (const { item } of ranked) {
+    if (seen.has(item.id)) continue;
+    seen.add(item.id);
+    items.push(item);
+  }
+  return items.slice(0, limit);
 }
 
+/** Every item of the index whose name matches the normalized query, best match first. */
 async function searchIndex<K extends EntityKind>(
   client: BibleApiClient,
   kind: K,
   query: string,
-  limit: number,
-): Promise<Array<IndexItems[K]>> {
+): Promise<Array<{ item: IndexItems[K]; tier: number }>> {
   const collection = COLLECTION[kind];
   const index = await client.datasetIndex<Record<string, Array<IndexItems[K]>>>(THEOGRAPHIC, collection);
 
@@ -260,7 +280,7 @@ async function searchIndex<K extends EntityKind>(
     if (tier !== undefined) matches.push({ item, tier });
   }
   matches.sort((a, b) => a.tier - b.tier || (b.item.numberOfReferences ?? 0) - (a.item.numberOfReferences ?? 0));
-  return matches.slice(0, limit).map((match) => match.item);
+  return matches;
 }
 
 /** The History Globe place index. */
