@@ -25,3 +25,4 @@ Branch: `fix/theographic-review-findings`. Workers do not commit or run `npm run
 - L1 (user, verbatim): "Encarala en paralelo, luego commitealas, pusheá, armá la PR y mergeala"
 - L2: finding texts are not available beyond id, lens, location and severity; specs are derived from the ids and the code at those locations.
 - L3: T2 and T3 ran as parallel workers; `npm run check` 160/160 after `npm run build`. T2 changed the expected order to Joseph, Josephus, Joses (translated prefix matches rank before partial direct hits).
+- L4: independent verify after merge (b69ff5c): S3 FAIL. T3 removed `david`, so the "returns each entity once" test (Davíd) no longer ran a translated query and passed with dedupe disabled; the José ranking comment was also wrong. Fixed with a José/Joseph overlap test (RED with dedupe disabled in a scratch copy, GREEN 160/160) on branch test/theographic-dedupe-overlap.

@@ -174,7 +174,8 @@ test('searchEntities uses the English spelling of a Spanish name when nothing ma
 
 test('searchEntities ranks the translated match ahead of a partial direct hit', async () => {
   const { api } = client({ '/api/d/theographic/people.json': josephIndex });
-  // "jose" only prefixes Joses (the best-attested hit); the translation "Joseph" matches Joseph, then Josephus.
+  // "jose" prefixes Joses, Josephus and Joseph directly, with none exact; the translation "Joseph" matches
+  // Joseph exactly, then prefixes Josephus, so both rank ahead of the remaining direct hit Joses.
   assert.deepEqual((await searchEntities(api, 'person', 'José')).map((p) => p.id), ['joseph_3', 'josephus_2', 'joses_1']);
   assert.deepEqual((await searchEntities(api, 'person', 'José', { limit: 1 })).map((p) => p.id), ['joseph_3']);
 });
@@ -187,9 +188,9 @@ test('searchEntities keeps an exact direct hit ahead of the translated match', a
 });
 
 test('searchEntities returns each entity once when the direct and translated matches overlap', async () => {
-  const { api } = client({ '/api/d/theographic/people.json': peopleIndex });
-  // "Davíd" and its translation "David" match the same people.
-  assert.deepEqual((await searchEntities(api, 'person', 'Davíd')).map((p) => p.id), ['david_1', 'david_2', 'davidson_3', 'jonathan_5', 'adavid_4']);
+  const { api } = client({ '/api/d/theographic/people.json': { people: [{ id: 'joseph_3', name: 'Joseph', numberOfReferences: 200 }] } });
+  // "jose" prefixes Joseph directly and its translation "Joseph" matches it exactly.
+  assert.deepEqual((await searchEntities(api, 'person', 'José')).map((p) => p.id), ['joseph_3']);
 });
 
 test('searchEntities returns [] for a name with no translation and no match', async () => {
