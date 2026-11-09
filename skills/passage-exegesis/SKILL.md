@@ -1,6 +1,6 @@
 ---
 name: passage-exegesis
-description: Use when studying a specific Bible passage in depth: literary and historical context, structure, observations, key terms, classical commentaries, cross references and application, following the grammatical-historical method.
+description: "Use when studying a specific Bible passage in depth: literary and historical context, structure, observations, key terms, classical commentaries, cross references and application, following the grammatical-historical method."
 ---
 
 # Passage exegesis

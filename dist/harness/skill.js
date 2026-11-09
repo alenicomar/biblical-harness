@@ -10,7 +10,7 @@ export function renderSkill(harness) {
     const profiles = PROFILES.map((p) => `- \`${p.id}\`${p.id === DEFAULT_PROFILE_ID ? ' (default)' : ''}: ${p.name} (${p.nameEs}). ${p.summary}`).join('\n');
     return `---
 name: ${harness.id}
-description: ${harness.summary}
+description: ${JSON.stringify(harness.summary)}
 ---
 
 # ${harness.title}

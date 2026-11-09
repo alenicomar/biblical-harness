@@ -74,7 +74,7 @@ test('buildPrompt puts guardrails, profile, language and output schema in the sy
 test('renderSkill produces a SKILL.md with frontmatter, gather command, method, guardrails and profiles', () => {
   const skill = renderSkill(toy);
 
-  assert.match(skill, /^---\nname: toy-study\ndescription: Use when testing the harness contract\.\n---\n/);
+  assert.match(skill, /^---\nname: toy-study\ndescription: "Use when testing the harness contract\."\n---\n/);
   assert.ok(skill.includes('biblical-harness gather toy-study --input'));
   assert.ok(skill.includes('Passage, e.g. \\"Jn 3:16\\"') || skill.includes('Passage, e.g. "Jn 3:16"'));
   assert.ok(skill.includes('1. Read the passage.'));

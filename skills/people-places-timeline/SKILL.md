@@ -1,6 +1,6 @@
 ---
 name: people-places-timeline
-description: Use when studying the people, places and events of a passage, or one biblical person, place or event: who they are, where (with coordinates), when (timeline) and how they relate, from Theographic and History Globe.
+description: "Use when studying the people, places and events of a passage, or one biblical person, place or event: who they are, where (with coordinates), when (timeline) and how they relate, from Theographic and History Globe."
 ---
 
 # People, places and timeline
@@ -43,7 +43,7 @@ Input (JSON Schema):
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "English name as Theographic spells it, e.g. \"David\", \"Bethlehem\", \"Philippi\", \"The Exodus\" (translate Spanish names: Belén → Bethlehem, Pedro → Peter). Accents and case are ignored."
+          "description": "Name of the person, place, event or group, e.g. \"David\", \"Bethlehem\", \"Philippi\", \"The Exodus\". Theographic spells names in English; common Spanish names (Belén, Pedro, Pablo…) are translated automatically, other Spanish names must be given in English. Accents and case are ignored."
         }
       },
       "required": [

@@ -16,7 +16,7 @@ export function renderSkill(harness: Harness<z.ZodType, z.ZodType, unknown>): st
 
   return `---
 name: ${harness.id}
-description: ${harness.summary}
+description: ${JSON.stringify(harness.summary)}
 ---
 
 # ${harness.title}

@@ -40,7 +40,7 @@ const input = z
           .string()
           .min(1)
           .describe(
-            'English name as Theographic spells it, e.g. "David", "Bethlehem", "Philippi", "The Exodus" (translate Spanish names: Belén → Bethlehem, Pedro → Peter). Accents and case are ignored.',
+            'Name of the person, place, event or group, e.g. "David", "Bethlehem", "Philippi", "The Exodus". Theographic spells names in English; common Spanish names (Belén, Pedro, Pablo…) are translated automatically, other Spanish names must be given in English. Accents and case are ignored.',
           ),
       })
       .optional()
@@ -293,7 +293,7 @@ async function gatherEntity(client: BibleApiClient, params: Params): Promise<Peo
   const [best, ...others] = matches;
   if (!best) {
     throw new Error(
-      `No ${kind} matches "${name}" in Theographic. Names are in English (e.g. "Bethlehem", "Peter"); try the English name, another spelling or another kind (person, place, event, group).`,
+      `No ${kind} matches "${name}" in Theographic. Theographic names are in English (e.g. "Bethlehem", "Peter") and only common Spanish names are translated; try the English name, another spelling or another kind (person, place, event, group).`,
     );
   }
 

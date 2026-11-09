@@ -55,7 +55,7 @@ Pass `--profile <id>` (default `plural`). All profiles share the core evangelica
 - Commentaries are in English (`biblical-harness commentaries`). Reports are still written in the requested language (`--lang`, default `es`).
 - The API has no full-text search, so a thematic study needs seed passages you choose.
 - `word-study` counts occurrences by scanning interlinear chapters: a book is quick, a whole testament fetches hundreds of chapters on the first run (about 90 s for the OT), then it is cached. Lexicon definitions are in English.
-- `people-places-timeline` looks names up in English, as Theographic spells them (`Bethlehem`, `Peter`). Its dates follow one chronology and are approximate, and its descriptions come from Easton's Bible Dictionary (1897).
+- `people-places-timeline` looks names up in English, as Theographic spells them (`Bethlehem`, `Peter`); about 100 common Spanish names (`Belén`, `Pablo`) are translated automatically, the rest must be given in English. Its dates follow one chronology and are approximate, and its descriptions come from Easton's Bible Dictionary (1897).
 - Responses are immutable, so they are cached forever in `$BIBLICAL_HARNESS_CACHE_DIR`, else `$XDG_CACHE_HOME/biblical-harness`, else `~/.cache/biblical-harness`. Use `--no-cache` to skip the disk.
 - Each text and dataset keeps its own license; check it before redistributing.
 

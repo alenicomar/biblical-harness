@@ -157,6 +157,48 @@ test('searchEntities matches alsoCalled for people when the index provides it', 
   assert.deepEqual((await searchEntities(api, 'person', 'Jedidiah')).map((p) => p.id), ['solomon_6']);
 });
 
+const josephIndex = {
+  people: [
+    { id: 'joses_1', name: 'Joses', numberOfReferences: 900 },
+    { id: 'josephus_2', name: 'Josephus', numberOfReferences: 800 },
+    { id: 'joseph_3', name: 'Joseph', numberOfReferences: 200 },
+  ],
+};
+
+test('searchEntities uses the English spelling of a Spanish name when nothing matches directly', async () => {
+  const { api } = client({
+    '/api/d/theographic/places.json': { places: [{ id: 'bethlehem_1', name: 'Bethlehem', numberOfReferences: 40 }] },
+  });
+  assert.deepEqual((await searchEntities(api, 'place', 'Belén')).map((p) => p.id), ['bethlehem_1']);
+});
+
+test('searchEntities ranks the translated match ahead of a partial direct hit', async () => {
+  const { api } = client({ '/api/d/theographic/people.json': josephIndex });
+  // "jose" only prefixes Joses (the best-attested hit); the translation "Joseph" matches Joseph, then Josephus.
+  assert.deepEqual((await searchEntities(api, 'person', 'José')).map((p) => p.id), ['joseph_3', 'josephus_2', 'joses_1']);
+  assert.deepEqual((await searchEntities(api, 'person', 'José', { limit: 1 })).map((p) => p.id), ['joseph_3']);
+});
+
+test('searchEntities keeps an exact direct hit ahead of the translated match', async () => {
+  const { api } = client({
+    '/api/d/theographic/people.json': { people: [...josephIndex.people, { id: 'jose_4', name: 'José', numberOfReferences: 1 }] },
+  });
+  assert.deepEqual((await searchEntities(api, 'person', 'José')).map((p) => p.id), ['jose_4', 'joseph_3', 'josephus_2', 'joses_1']);
+});
+
+test('searchEntities returns each entity once when the direct and translated matches overlap', async () => {
+  const { api } = client({ '/api/d/theographic/people.json': peopleIndex });
+  // "Davíd" and its translation "David" match the same people.
+  assert.deepEqual((await searchEntities(api, 'person', 'Davíd')).map((p) => p.id), ['david_1', 'david_2', 'davidson_3', 'jonathan_5', 'adavid_4']);
+});
+
+test('searchEntities returns [] for a name with no translation and no match', async () => {
+  const { api } = client({
+    '/api/d/theographic/places.json': { places: [{ id: 'bethlehem_1', name: 'Bethlehem', numberOfReferences: 40 }] },
+  });
+  assert.deepEqual(await searchEntities(api, 'place', 'Atlantida'), []);
+});
+
 test('searchEntities reads the index of each kind', async () => {
   const { api, calls } = client({
     '/api/d/theographic/places.json': { places: [{ id: 'bethlehem_1', name: 'Bethlehem', numberOfReferences: 40 }] },
