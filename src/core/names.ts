@@ -1,4 +1,4 @@
-/** Lowercase, diacritics stripped, whitespace collapsed: "  José  " -> "jose". */
+/** CI red probe (do not merge). Lowercase, diacritics stripped, whitespace collapsed: "  José  " -> "jose". */
 export function normalizeName(name: string): string {
   return name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
 }
