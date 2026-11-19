@@ -113,8 +113,7 @@ ANTHROPIC_API_KEY=... biblical-harness run passage-exegesis --input @exegesis.js
 
 ## Roadmap
 
-- MCP server over the same core and harnesses.
-- Spanish names for `people-places-timeline` lookups.
+Planned work lives in the [issue tracker](https://github.com/alenicomar/biblical-harness/issues). The main item is an [MCP server over the same core and harnesses](https://github.com/alenicomar/biblical-harness/issues/4).
 
 ## Development
 
