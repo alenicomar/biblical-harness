@@ -16,8 +16,9 @@ test('the CI workflow runs npm ci and npm run check on Node 24 for pull requests
   assert.match(workflow, /- run: npm run check\n/);
 });
 
-test('the CI workflow never cancels a run on main and does not persist the checkout token', async () => {
+test('the CI workflow never cancels or replaces a run on main and does not persist the checkout token', async () => {
   const workflow = (await readFile(join(root, '.github', 'workflows', 'ci.yml'), 'utf8')).replace(/\r\n/g, '\n');
+  assert.match(workflow, /group: ci-\$\{\{ github\.event_name == 'pull_request' && github\.ref \|\| github\.sha \}\}\n/);
   assert.match(workflow, /cancel-in-progress: \$\{\{ github\.event_name == 'pull_request' \}\}\n/);
   assert.match(workflow, /- uses: actions\/checkout@v5\n {8}with:\n {10}persist-credentials: false\n/);
 });
