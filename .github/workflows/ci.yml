@@ -8,9 +8,11 @@ on:
 permissions:
   contents: read
 
+# A newer push to a PR supersedes its older run; every run on main finishes, so each
+# merged commit is checked.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -19,6 +21,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v5
         with:
           node-version: 24
