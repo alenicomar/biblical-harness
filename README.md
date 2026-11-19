@@ -125,4 +125,6 @@ npm run build    # compile src/ to dist/ (committed: the installed CLI runs dist
 node src/cli/main.ts <command>   # run from source without building
 ```
 
+CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm run check` on Node 24 for every pull request and push to `main`.
+
 TypeScript runs directly on Node 24 (native type stripping): relative imports use `.ts` extensions and only erasable syntax is allowed.
